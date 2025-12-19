@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quiz-app</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      font-family: "Montserrat", sans-serif;
+      font-optical-sizing: auto;
+      font-weight: 500;
+      font-style: normal;
+      box-sizing: border-box;
+    }
+    .container {
+      background: linear-gradient(135deg, #00c6ff, #0072ff);
+
+      height: 100vh;
+      position: relative;
+    }
+    .quizapp {
+      background-color: white;
+      position: absolute;
+      top: 35%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 30%;
+      height: 50%;
+      border-radius: 30px;
+      padding: 15px;
+    }
+    h3 {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    h2 {
+      margin: 10px;
+    }
+    button {
+      outline: none;
+      border: none;
+      display: block;
+      margin: 10px;
+    }
+    .option {
+      background-color: #afeeff;
+      padding: 10px;
+      border-radius: 10px;
+    }
+    .submit {
+      background-color: #00ffcc;
+      padding: 10px;
+      border-radius: 10px;
+    }
+    .correctoption {
+      background-color: #52ed55;
+    }
+  </style>
+  <body>
+    <div class="container">
+      <div class="quizapp">
+        <h2 class="question"></h2>
+        <div class="optionlist"></div>
+        <button class="submit">next</button>
+        <h3></h3>
+      </div>
+    </div>
+    <script>
+      const questions = [
+        {
+          question: "What does HTML stand for?",
+          options: [
+            "Hyper Text Markup Language",
+            "High Tech Modern Language",
+            "Hyperlinks and Text Markup Language",
+            "Home Tool Markup Language",
+          ],
+          answer: 0,
+        },
+        {
+          question: "Which language runs in a web browser?",
+          options: ["Java", "C", "Python", "JavaScript"],
+          answer: 3,
+        },
+        {
+          question: "CSS stands for?",
+          options: [
+            "Cascading Style Sheets",
+            "Creative Style System",
+            "Colorful Style Syntax",
+            "Computer Style Sheet",
+          ],
+          answer: 0,
+        },
+      ];
+      const questionText = document.querySelector(".question");
+      const nextbutton = document.querySelector(".submit");
+      const op = document.querySelector(".option");
+      const optionlist = document.querySelector(".optionlist");
+      const time = document.querySelector("h3");
+
+      let index = 0;
+      let timerLeft= 10;
+      let timer;
+      let score=0;
+
+      showQuestion(index);
+
+      function showQuestion(index) {
+        resetstate();
+        timers();
+        let currentQuestion = questions[index];
+        questionText.textContent = currentQuestion.question;
+        currentQuestion.options.forEach((op, indexofbuttonClick) => {
+          const buttons = document.createElement("button");
+          buttons.textContent = op;
+          buttons.classList.add("option");
+          optionlist.appendChild(buttons);
+          buttons.addEventListener("click", function () {
+            selectans(indexofbuttonClick);
+          });
+        });
+      }
+      
+      
+      function selectans(indexofbuttonClick){
+        let correctAnswer = questions[index].answer;
+        if(indexofbuttonClick==correctAnswer){
+          score++;
+        }
+        nextbutton.style.display='block';
+        clearInterval(timer);
+        disableOptions();
+      }
+      function disableOptions(){
+        let correctAnswer = questions[index].answer;
+        const options = document.querySelectorAll('.option');
+        options.forEach((btn,i) => {
+          btn.disabled=true;
+          if (i === correctAnswer) {
+          btn.style.background = "#90EE90"; 
+        } else {
+          btn.style.background = "#FF7F7F"; 
+        }
+        });
+        nextbutton.style.display='block';
+      }
+
+      function resetstate() {
+        clearInterval(timer)
+        optionlist.innerHTML=""
+        nextbutton.style.display = "none";
+        timerLeft=10;
+        time.textContent = `time : ${timerLeft}s`;
+      }
+
+      function timers(){
+        timer =setInterval(()=>{
+          timerLeft--;
+          time.textContent=`time : ${timerLeft}s`
+         if (timerLeft===0) {
+             clearInterval(timer);
+             nextbutton.style.disaplay='block'
+             disableOptions();
+         }
+      },1000)
+    }
+      function showresult() {
+        clearInterval(timer)
+        questionText.textContent = `Quiz Have Completed `;
+        optionlist.textContent = `You have score ${score}/${questions.length}`
+
+        nextbutton.style.display="none"
+        time.style.display="none"
+      }
+      nextbutton.addEventListener("click", function () {
+        clearInterval(timer);
+        index++;
+        if(index<questions.length){
+          showQuestion(index);
+
+
+        }
+        else{
+          showresult();
+        }
+      });
+
+    
+    </script>
+  </body>
+</html>

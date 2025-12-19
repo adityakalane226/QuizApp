@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .quiz-container {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0px 4px 10px rgba(0,0,0,0.2);
+      width: 400px;
+      text-align: center;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+    }
+
+    .option {
+      display: block;
+      margin: 10px 0;
+      padding: 10px;
+      background: #eee;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .option:hover {
+      background: #d3d3f3;
+    }
+
+    #next-btn {
+      margin-top: 15px;
+      padding: 10px 20px;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      display: none;
+    }
+
+    #timer {
+      font-weight: bold;
+      color: red;
+      margin-bottom: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="quiz-container">
+    <h2 id="question">Loading...</h2>
+    <div id="options"></div>
+    <p id="timer">Time left: 10s</p>
+    <button id="next-btn">Next</button>
+  </div>
+
+  <script>
+    // Questions Data
+    const questions = [
+      {
+        question: "What does HTML stand for?",
+        options: ["Hyper Text Markup Language", "High Tech Modern Language", "Hyperlinks and Text Markup Language", "Home Tool Markup Language"],
+        answer: 0
+      },
+      {
+        question: "Which language runs in a web browser?",
+        options: ["Java", "C", "Python", "JavaScript"],
+        answer: 3
+      },
+      {
+        question: "CSS stands for?",
+        options: ["Cascading Style Sheets", "Creative Style System", "Colorful Style Syntax", "Computer Style Sheet"],
+        answer: 0
+      }
+    ];
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let timeLeft = 10;
+    let timer;
+
+    const questionEl = document.getElementById("question");
+    const optionsEl = document.getElementById("options");
+    const nextBtn = document.getElementById("next-btn");
+    const timerEl = document.getElementById("timer");
+
+    function startQuiz() {
+      currentQuestionIndex = 0;
+      score = 0;
+      showQuestion();
+    }
+
+    function showQuestion() {
+      resetState();
+      let currentQuestion = questions[currentQuestionIndex];
+      questionEl.textContent = currentQuestion.question;
+
+      currentQuestion.options.forEach((option, index) => {
+        const button = document.createElement("button");
+        button.textContent = option;
+        button.classList.add("option");
+        button.addEventListener("click", () => selectAnswer(index));
+        optionsEl.appendChild(button);
+      });
+
+      startTimer();
+    }
+
+    function resetState() {
+      clearInterval(timer);
+      timeLeft = 10;
+      timerEl.textContent = `Time left: ${timeLeft}s`;
+      optionsEl.innerHTML = "";
+      nextBtn.style.display = "none";
+    }
+
+    function startTimer() {
+      timer = setInterval(() => {
+        timeLeft--;
+        timerEl.textContent = `Time left: ${timeLeft}s`;
+
+        if (timeLeft === 0) {
+          clearInterval(timer);
+          nextBtn.style.display = "block";
+          disableOptions();
+        }
+      }, 1000);
+    }
+
+    function selectAnswer(selectedIndex) {
+      let correctAnswer = questions[currentQuestionIndex].answer;
+      if (selectedIndex === correctAnswer) {
+        score++;
+      }
+      disableOptions();
+      nextBtn.style.display = "block";
+      clearInterval(timer);
+    }
+
+    function disableOptions() {
+      const allOptions = document.querySelectorAll(".option");
+      allOptions.forEach((btn, i) => {
+        btn.disabled = true;
+        if (i === questions[currentQuestionIndex].answer) {
+          btn.style.background = "#90EE90"; // Green for correct
+        } else {
+          btn.style.background = "#FF7F7F"; // Red for wrong
+        }
+      });
+    }
+
+    nextBtn.addEventListener("click", () => {
+      currentQuestionIndex++;
+      if (currentQuestionIndex < questions.length) {
+        showQuestion();
+      } else {
+        showResult();
+      }
+    });
+
+    function showResult() {
+      clearInterval(timer);
+      questionEl.textContent = `Quiz Finished! 🎉`;
+      optionsEl.innerHTML = `<h3>Your Score: ${score} / ${questions.length}</h3>`;
+      nextBtn.style.display = "none";
+      timerEl.style.display = "none";
+    }
+
+    startQuiz();
+  </script>
+</body>
+</html>
